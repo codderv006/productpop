@@ -7,7 +7,7 @@ const SECRET = process.env.SESSION_SECRET || "dev-secret-change-me";
 export const COOKIE = "pp_session";
 
 export const DEMO_USERNAME = "demo";
-export const DEMO_NAME = "Bunty Bubblegum";
+export const DEMO_NAME = "Aarav Mehta";
 export const DEMO_PASSWORD = process.env.DEMO_PASSWORD || "productpop2026";
 
 function hash(password: string, salt: string) {
