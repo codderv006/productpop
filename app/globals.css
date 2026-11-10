@@ -193,3 +193,6 @@ textarea.input { resize: vertical; min-height: 80px; line-height: 1.55; }
   .dash-main { overflow: visible; }
   .dash-activity { max-height: 520px; }
 }
+
+/* activity: fixed badge column so every row's text lines up */
+.activity .it > .badge { flex: none; width: 76px; justify-content: center; }
