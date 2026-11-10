@@ -289,7 +289,7 @@ export default function AssetPage({ params }: { params: Promise<{ id: string }> 
 
           {isVideo ? (
             <>
-              <VideoStudio asset={server} uid={uid} dirty={dirty} />
+              {product ? <VideoStudio asset={server} product={product} dirty={dirty} /> : null}
               <div className="slides-strip">
                 {server.scenes.map((_, i) => <img key={i} src={renderUrl(uid, server, `&scene=${i}`)} alt="" style={{ height: 150 }} />)}
               </div>
