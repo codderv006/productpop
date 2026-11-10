@@ -179,7 +179,7 @@ function assetSummary(a: Asset, base: string, uid: string) {
     last_edited_by: a.updatedBy === "you" ? "founder (in app)" : "claude",
     link: `${base}/assets/${a.id}`,
   };
-  if (a.format === "visual_post") s.image_png = `${base}/api/render/${uid}/${a.id}?v=${a.version}`;
+  if (a.format === "visual_post") s.image_png = `${base}/api/render/${uid}/${a.id}?v=${a.version}&t=${Date.now()}`;
   if (a.format === "carousel") s.slide_pngs = a.slides.map((_, i) => `${base}/api/render/${uid}/${a.id}?slide=${i}&v=${a.version}`);
   if (a.format === "video_script") s.scenes = a.scenes.length;
   return s;

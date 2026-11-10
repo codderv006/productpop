@@ -108,7 +108,17 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
               <Color label="Background" value={b.background} onChange={(v) => set({ brand: { ...b, background: v } })} />
               <Color label="Text" value={b.text} onChange={(v) => set({ brand: { ...b, text: v } })} />
             </div>
-            <ImageUpload label="Logo" value={d.logoUrl} onChange={(u) => set({ logoUrl: u })} />
+            <ImageUpload
+              label="Logo"
+              value={d.logoUrl}
+              onChange={async (u) => {
+                set({ logoUrl: u });
+                if (isNew) return;
+                await api(`/api/products/${id}`, "PATCH", { name: d.name, tagline: d.tagline, website: d.website, category: d.category, description: d.description, audience: d.audience, features: d.features, voice: d.voice, brand: d.brand, logoUrl: u });
+                await refresh();
+                toast(u ? "Logo saved — every post, carousel and Reel now uses it" : "Logo removed");
+              }}
+            />
             <div style={{ borderRadius: 14, padding: 22, color: b.text, backgroundColor: b.background, backgroundImage: `radial-gradient(circle at 90% 0%, ${b.primary}aa, transparent 60%), radial-gradient(circle at 0% 100%, ${b.accent}55, transparent 55%)` }}>
               <div className="row" style={{ fontWeight: 700 }}>
                 {d.logoUrl ? <img src={d.logoUrl} alt="" style={{ width: 26, height: 26, borderRadius: 6, objectFit: "contain" }} /> : <span style={{ width: 26, height: 26, borderRadius: 7, background: `linear-gradient(135deg, ${b.primary}, ${b.accent})`, display: "grid", placeItems: "center", color: "#fff", fontSize: 13 }}>{(d.name || "P")[0]}</span>}

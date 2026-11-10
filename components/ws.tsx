@@ -51,6 +51,7 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
       if (newIds.length) setFresh((f) => new Set([...f, ...newIds]));
     }
     seen.current = new Set(ids);
+    for (const p of w.products) productStamp[p.id] = p.updatedAt;
     const top = w.activity[0];
     if (top && lastActivity.current && top.at !== lastActivity.current && top.actor === "claude") toast(`Claude: ${top.summary}`);
     lastActivity.current = top?.at ?? "";
@@ -94,8 +95,20 @@ export const FORMAT: Record<AssetFormat, string> = {
   video_script: "Reel / Short",
 };
 
+// product "version" per product id, so images re-render when the brand/logo changes
+const productStamp: Record<string, string> = {};
 export function renderUrl(uid: string, a: Asset, extra = "") {
-  return `/api/render/${uid}/${a.id}?v=${a.version}${extra}`;
+  const p = productStamp[a.productId] ? `&p=${encodeURIComponent(productStamp[a.productId])}` : "";
+  return `/api/render/${uid}/${a.id}?v=${a.version}${p}${extra}`;
+}
+
+export function ProductMark({ p, size = 17 }: { p: { name: string; logoUrl: string; brand: { primary: string; accent: string } }; size?: number }) {
+  if (p.logoUrl) return <img src={p.logoUrl} alt="" style={{ width: size, height: size, borderRadius: size * 0.25, objectFit: "contain", flex: "none", background: "#fff" }} />;
+  return (
+    <span style={{ width: size, height: size, borderRadius: size * 0.28, background: `linear-gradient(135deg, ${p.brand.primary}, ${p.brand.accent})`, display: "inline-grid", placeItems: "center", color: "#fff", fontWeight: 800, fontSize: size * 0.5, flex: "none" }}>
+      {p.name.slice(0, 1).toUpperCase()}
+    </span>
+  );
 }
 
 export function fmtDate(d: string) {

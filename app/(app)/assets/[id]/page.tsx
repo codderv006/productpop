@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import ImageUpload from "@/components/ImageUpload";
 import VideoStudio from "@/components/VideoStudio";
-import { FORMAT, PLATFORM, PlatformTag, Who, ago, api, fullText, renderUrl, useWs } from "@/components/ws";
+import { FORMAT, PLATFORM, PlatformTag, ProductMark, Who, ago, api, fullText, renderUrl, useWs } from "@/components/ws";
 import type { Asset, Platform } from "@/lib/types";
 
 const STATUSES = ["draft", "ready", "scheduled", "published"] as const;
@@ -304,7 +304,7 @@ export default function AssetPage({ params }: { params: Promise<{ id: string }> 
                 d.thread.map((t, i) => (
                   <div key={i} className="social">
                     <div className="who">
-                      <div className="av" style={{ background: product ? `linear-gradient(135deg, ${product.brand.primary}, ${product.brand.accent})` : "#333" }}>{product?.name[0]}</div>
+                      {product ? <ProductMark p={product} size={40} /> : null}
                       <div><b>{product?.name}</b> <span className="muted small">@{product?.name.toLowerCase().replace(/\s/g, "")}</span></div>
                     </div>
                     <div className="txt">{t}</div>
@@ -313,8 +313,8 @@ export default function AssetPage({ params }: { params: Promise<{ id: string }> 
               ) : (
                 <div className="social">
                   <div className="who">
-                    <div className="av" style={{ background: product ? `linear-gradient(135deg, ${product.brand.primary}, ${product.brand.accent})` : "#333" }}>{user.name[0]}</div>
-                    <div><b>{user.name}</b><div className="small muted">Founder, {product?.name}</div></div>
+                    {product ? <ProductMark p={product} size={40} /> : null}
+                    <div><b>{product?.name}</b><div className="small muted">{user.name}, Founder</div></div>
                   </div>
                   <div className="txt">{[d.hook && !d.body.startsWith(d.hook) ? d.hook : "", d.body, d.cta && !d.body.includes(d.cta) ? d.cta : ""].filter(Boolean).join("\n\n")}</div>
                   {d.hashtags.length ? <div className="tags">{d.hashtags.join(" ")}</div> : null}

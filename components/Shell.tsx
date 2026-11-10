@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useWs } from "./ws";
+import { ProductMark, useWs } from "./ws";
 
 const I = {
   home: "M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z",
@@ -43,7 +43,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
         <div className="nav-sec">Products</div>
         {ws?.products.map((p) => (
           <Link key={p.id} href={`/products/${p.id}`} className={"nav" + (path === `/products/${p.id}` ? " active" : "")}>
-            <span style={{ width: 17, height: 17, borderRadius: 5, background: `linear-gradient(135deg, ${p.brand.primary}, ${p.brand.accent})`, display: "inline-block" }} />
+            <ProductMark p={p} />
             {p.name}
           </Link>
         ))}

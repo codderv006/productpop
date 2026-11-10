@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Who, ago, useWs } from "@/components/ws";
+import { ProductMark, Who, ago, useWs } from "@/components/ws";
 
 export default function Dashboard() {
   const { ws, user, fresh } = useWs();
@@ -58,7 +58,7 @@ export default function Dashboard() {
                   <Link key={c.id} href={`/campaigns/${c.id}`} className={"card hover stack" + (fresh.has(c.id) ? " flash" : "")} style={{ gap: 10 }}>
                     <div className="between">
                       <span className="row small" style={{ fontWeight: 700 }}>
-                        <span style={{ width: 14, height: 14, borderRadius: 4, background: p ? `linear-gradient(135deg, ${p.brand.primary}, ${p.brand.accent})` : "#ccc" }} />
+                        {p ? <ProductMark p={p} size={18} /> : null}
                         {p?.name}
                       </span>
                       <Who actor={c.createdBy} />
