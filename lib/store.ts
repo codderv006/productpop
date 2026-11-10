@@ -69,25 +69,31 @@ export async function writeDoc<T>(key: string, data: T, etag?: string | null): P
   await fs.writeFile(file, body);
 }
 
-/** Read-modify-write with retries on concurrent modification. */
+/** Read-modify-write. Uses the ETag for optimistic concurrency; if the store keeps
+ * rejecting a write while the document is unchanged (ETag format mismatch), fall back
+ * to an unconditional write so saves never get stuck. */
 export async function mutateDoc<T, R>(
   key: string,
   init: () => T,
   fn: (doc: T) => R | Promise<R>
 ): Promise<R> {
-  for (let attempt = 0; attempt < 5; attempt++) {
+  for (let attempt = 0; attempt < 4; attempt++) {
     const existing = await readDoc<T>(key);
     const data = existing ? existing.data : init();
     const result = await fn(data);
+    const etag = existing?.etag && existing.etag !== "local" ? existing.etag : undefined;
     try {
-      await writeDoc(key, data, existing?.etag && existing.etag !== "local" ? existing.etag : undefined);
+      await writeDoc(key, data, etag);
       return result;
     } catch (e) {
-      if (e instanceof ConflictError) {
-        await new Promise((r) => setTimeout(r, 80 * (attempt + 1)));
-        continue;
+      if (!(e instanceof ConflictError)) throw e;
+      const now = await readDoc<T>(key);
+      if (!now || now.etag === etag) {
+        // Nothing changed underneath us: the precondition itself is unusable.
+        await writeDoc(key, data, undefined);
+        return result;
       }
-      throw e;
+      await new Promise((r) => setTimeout(r, 80 * (attempt + 1)));
     }
   }
   throw new Error("Could not save after several attempts, please retry.");
