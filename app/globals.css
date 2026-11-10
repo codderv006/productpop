@@ -177,3 +177,19 @@ textarea.input { resize: vertical; min-height: 80px; line-height: 1.55; }
   .auth-hero { display: none; }
   .cal { grid-template-columns: 1fr; }
 }
+
+/* dashboard: fixed-height layout, activity column scrolls on its own */
+.main:has(.dash) { max-width: none; padding-bottom: 28px; height: 100vh; overflow: hidden; }
+.dash { height: 100%; display: flex; flex-direction: column; gap: 20px; min-height: 0; }
+.dash-body { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 22px; }
+.dash-main { min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 22px; padding: 2px 4px 24px 2px; margin: -2px -4px 0 -2px; }
+.dash-activity { min-height: 0; display: flex; flex-direction: column; padding-bottom: 6px; }
+.dash-activity .activity { flex: 1; min-height: 0; overflow-y: auto; margin-right: -10px; padding-right: 10px; }
+.dash-main::-webkit-scrollbar, .dash-activity .activity::-webkit-scrollbar { width: 8px; }
+.dash-main::-webkit-scrollbar-thumb, .dash-activity .activity::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 99px; }
+@media (max-width: 900px) {
+  .main:has(.dash) { height: auto; overflow: visible; }
+  .dash-body { grid-template-columns: 1fr; }
+  .dash-main { overflow: visible; }
+  .dash-activity { max-height: 520px; }
+}

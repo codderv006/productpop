@@ -18,8 +18,8 @@ export default function Dashboard() {
   const campaigns = ws.campaigns.slice().sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 
   return (
-    <div className="stack" style={{ gap: 22 }}>
-      <div className="between">
+    <div className="dash">
+      <div className="between dash-head">
         <div>
           <h1>Hi {user.name.split(" ")[0]} 👋</h1>
           <p className="muted">Everything Claude writes for your products lands here — ready to edit, render and ship.</p>
@@ -27,6 +27,8 @@ export default function Dashboard() {
         <span className="live">Live — syncing with Claude</span>
       </div>
 
+      <div className="dash-body">
+      <div className="dash-main">
       <div className="grid g4">
         {stats.map((s) => (
           <div key={s.l} className="card stat">
@@ -36,7 +38,6 @@ export default function Dashboard() {
         ))}
       </div>
 
-      <div className="grid" style={{ gridTemplateColumns: "minmax(0,1fr) 340px" }}>
         <div className="stack">
           <div className="between">
             <h2>Campaigns</h2>
@@ -79,11 +80,12 @@ export default function Dashboard() {
           )}
         </div>
 
-        <div className="card">
-          <div className="card-title"><h3>Activity</h3></div>
+      </div>
+        <div className="card dash-activity">
+          <div className="card-title"><h3>Activity</h3><span className="small muted">{ws.activity.length} events</span></div>
           <div className="activity">
             {ws.activity.length === 0 ? <p className="muted small">Nothing yet.</p> : null}
-            {ws.activity.slice(0, 14).map((a, i) => {
+            {ws.activity.map((a, i) => {
               const inner = (
                 <>
                   <Who actor={a.actor} />

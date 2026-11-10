@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Logo } from "@/components/Logo";
 
 export default function Login() {
   const [mode, setMode] = useState<"login" | "signup">("login");
@@ -31,7 +32,7 @@ export default function Login() {
     <div className="auth">
       <div className="auth-hero">
         <div className="row" style={{ fontWeight: 800, fontSize: 18 }}>
-          <span className="logo-mark">P</span> ProductPop
+          <Logo size={34} />
         </div>
         <div>
           <h1>Your product deserves to be seen.</h1>

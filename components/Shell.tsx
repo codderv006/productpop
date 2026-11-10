@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { ProductMark, useWs } from "./ws";
+import { Logo } from "./Logo";
 
 const I = {
   home: "M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z",
@@ -35,7 +36,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
     <div className="shell">
       <aside className="side">
         <Link href="/" className="logo">
-          <span className="logo-mark">P</span> ProductPop
+          <Logo size={30} />
         </Link>
         {nav("/", "Dashboard", I.home, true)}
         {nav("/calendar", "Calendar", I.cal)}
