@@ -7,6 +7,7 @@ const SECRET = process.env.SESSION_SECRET || "dev-secret-change-me";
 export const COOKIE = "pp_session";
 
 export const DEMO_USERNAME = "demo";
+export const DEMO_NAME = "Bunty Bubblegum";
 export const DEMO_PASSWORD = process.env.DEMO_PASSWORD || "productpop2026";
 
 function hash(password: string, salt: string) {
@@ -58,8 +59,14 @@ export async function createUser(username: string, password: string, name: strin
 
 export async function ensureDemoUser(): Promise<User> {
   const existing = await getUserByUsername(DEMO_USERNAME);
-  if (existing) return existing;
-  const user = await createUser(DEMO_USERNAME, DEMO_PASSWORD, "Demo Founder", process.env.DEMO_MCP_TOKEN || undefined);
+  if (existing) {
+    if (existing.name !== DEMO_NAME) {
+      existing.name = DEMO_NAME;
+      await writeDoc(`users/${existing.username}.json`, existing);
+    }
+    return existing;
+  }
+  const user = await createUser(DEMO_USERNAME, DEMO_PASSWORD, DEMO_NAME, process.env.DEMO_MCP_TOKEN || undefined);
   const { seedDemo } = await import("./seed");
   await seedDemo(user.id);
   return user;
