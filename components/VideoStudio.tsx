@@ -17,7 +17,7 @@ function pickMime() {
   return opts.find((m) => typeof MediaRecorder !== "undefined" && MediaRecorder.isTypeSupported(m)) ?? "";
 }
 
-export default function VideoStudio({ asset, product, dirty }: { asset: Asset; product: Product; dirty: boolean }) {
+export default function VideoStudio({ asset, product, dirty, watermark = false }: { asset: Asset; product: Product; dirty: boolean; watermark?: boolean }) {
   const canvas = useRef<HTMLCanvasElement>(null);
   const stopRef = useRef<(() => void) | null>(null);
   const [mode, setMode] = useState<"idle" | "loading" | "preview" | "recording" | "done" | "error">("idle");
@@ -27,7 +27,7 @@ export default function VideoStudio({ asset, product, dirty }: { asset: Asset; p
   const [music, setMusic] = useState<Music>("upbeat");
   const [trans, setTrans] = useState<TransitionStyle>("mixed");
   const [renderedKey, setRenderedKey] = useState("");
-  const key = `${asset.version}|${music}|${trans}`;
+  const key = `${asset.version}|${music}|${trans}|${watermark}`;
 
   // draw a static poster frame
   useEffect(() => {
@@ -36,11 +36,11 @@ export default function VideoStudio({ asset, product, dirty }: { asset: Asset; p
       if (!canvas.current || asset.scenes.length === 0) return;
       const L = await loadAssets(asset, product);
       if (!alive || !canvas.current) return;
-      const r = createRenderer(asset, product, L, trans);
+      const r = createRenderer(asset, product, L, trans, watermark);
       r.draw(canvas.current.getContext("2d")!, Math.min(1.6, asset.scenes[0].duration - 0.1));
     })();
     return () => { alive = false; };
-  }, [asset, product, trans]);
+  }, [asset, product, trans, watermark]);
 
   useEffect(() => () => { stopRef.current?.(); if (url) URL.revokeObjectURL(url); }, [url]);
 
@@ -52,7 +52,7 @@ export default function VideoStudio({ asset, product, dirty }: { asset: Asset; p
     setProgress(0);
     try {
       const L = await loadAssets(asset, product);
-      const r = createRenderer(asset, product, L, trans);
+      const r = createRenderer(asset, product, L, trans, watermark);
       const ac = new AudioContext();
       await ac.resume();
       const dest = ac.createMediaStreamDestination();

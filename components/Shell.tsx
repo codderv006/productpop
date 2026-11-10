@@ -22,7 +22,7 @@ function Icon({ d }: { d: string }) {
 export default function Shell({ children }: { children: React.ReactNode }) {
   const path = usePathname();
   const router = useRouter();
-  const { ws, user } = useWs();
+  const { ws, user, refresh, toast } = useWs();
   const nav = (href: string, label: string, icon: string, exact = false) => {
     const on = exact ? path === href : path.startsWith(href);
     return (
@@ -52,7 +52,22 @@ export default function Shell({ children }: { children: React.ReactNode }) {
           <Icon d="M12 5v14M5 12h14" /> New product
         </Link>
         <div className="side-foot">
-          <div style={{ fontWeight: 700, color: "var(--ink)" }}>{user?.name}</div>
+          <div className="between" style={{ marginBottom: 6 }}>
+            <div style={{ fontWeight: 700, color: "var(--ink)" }}>{user?.name}</div>
+            <span className={"badge " + (user?.plan === "pro" ? "you" : "")}>{user?.plan === "pro" ? "Pro" : "Free plan"}</span>
+          </div>
+          <button
+            className={"btn sm " + (user?.plan === "pro" ? "" : "brand")}
+            style={{ width: "100%", justifyContent: "center", marginBottom: 8 }}
+            onClick={async () => {
+              const next = user?.plan === "pro" ? "free" : "pro";
+              await fetch("/api/plan", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ plan: next }) });
+              await refresh();
+              toast(next === "pro" ? "Pro: “Made with ProductPop” badge removed" : "Free plan: badge back on images and Reels");
+            }}
+          >
+            {user?.plan === "pro" ? "Switch to Free" : "Upgrade to Pro — ₹999/mo"}
+          </button>
           <div className="between">
             <span>@{user?.username}</span>
             <button

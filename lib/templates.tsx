@@ -11,7 +11,7 @@ export const SIZES: Record<Aspect | "story", { width: number; height: number }> 
   landscape: { width: 1200, height: 675 },
 };
 
-type Ctx = { product: Product; logo?: string; image?: string; aspect: Aspect | "story" };
+type Ctx = { product: Product; logo?: string; image?: string; aspect: Aspect | "story"; watermark?: boolean };
 
 function hexToRgb(hex: string) {
   let h = hex.replace("#", "");
@@ -42,6 +42,24 @@ function Frame({ ctx, children, pad = 80 }: { ctx: Ctx; children: React.ReactNod
       }}
     >
       <div style={{ display: "flex", flexDirection: "column", flex: 1, position: "relative" }}>{children}</div>
+      {ctx.watermark ? <Watermark scale={Math.min(width, height) / 1080} /> : null}
+    </div>
+  );
+}
+
+export function Watermark({ scale = 1 }: { scale?: number }) {
+  const z = scale;
+  return (
+    <div style={{ position: "absolute", bottom: 22 * z, left: 0, right: 0, display: "flex", justifyContent: "center" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 10 * z, background: "rgba(15,12,30,0.62)", color: "#FFFFFF", padding: `${7 * z}px ${16 * z}px`, borderRadius: 999, fontSize: 20 * z, fontWeight: 700 }}>
+        <svg width={22 * z} height={22 * z} viewBox="0 0 64 64">
+          <rect width="64" height="64" rx="16" fill="#15131F" />
+          <circle cx="27" cy="36" r="14" fill="#7C5CFF" />
+          <circle cx="42" cy="22" r="8" fill="#22D3EE" />
+          <circle cx="48" cy="40" r="4" fill="#FF7A59" />
+        </svg>
+        Made with ProductPop
+      </div>
     </div>
   );
 }

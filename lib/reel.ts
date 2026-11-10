@@ -112,7 +112,7 @@ function drawBrand(ctx: CanvasRenderingContext2D, p: Product, L: Loaded, x: numb
 }
 
 /** Draw scene i at local time lt (seconds since the scene started). */
-function drawScene(ctx: CanvasRenderingContext2D, a: Asset, p: Product, L: Loaded, i: number, lt: number, gt: number) {
+function drawScene(ctx: CanvasRenderingContext2D, a: Asset, p: Product, L: Loaded, i: number, lt: number, gt: number, wm = false) {
   const sc = a.scenes[i];
   const n = a.scenes.length;
   const isLast = i === n - 1 && n > 1;
@@ -251,10 +251,32 @@ function drawScene(ctx: CanvasRenderingContext2D, a: Asset, p: Product, L: Loade
     ctx.font = `500 ${30 * S}px Jakarta, system-ui, sans-serif`;
     ctx.textAlign = "center";
     ctx.textBaseline = "alphabetic";
-    ctx.fillText(site, RW / 2, RH - 90 * S);
+    ctx.fillText(site, RW / 2, RH - (wm ? 120 : 90) * S);
     ctx.globalAlpha = 1;
   }
+  if (wm) drawWatermark(ctx);
   ctx.textAlign = "left";
+}
+
+function drawWatermark(ctx: CanvasRenderingContext2D) {
+  const fs = 22 * S;
+  ctx.font = `700 ${fs}px Jakarta, system-ui, sans-serif`;
+  const label = "Made with ProductPop";
+  const tw = ctx.measureText(label).width;
+  const icon = 26 * S, gap = 10 * S, padX = 18 * S, h = 46 * S;
+  const w = padX * 2 + icon + gap + tw;
+  const x = (RW - w) / 2, y = RH - 40 * S - h;
+  ctx.fillStyle = "rgba(15,12,30,0.62)";
+  roundRect(ctx, x, y, w, h, h / 2);
+  ctx.fill();
+  const ix = x + padX, iy = y + (h - icon) / 2, k = icon / 64;
+  ctx.fillStyle = "#15131F"; roundRect(ctx, ix, iy, icon, icon, 16 * k); ctx.fill();
+  const dot = (cx: number, cy: number, r: number, c: string) => { ctx.fillStyle = c; ctx.beginPath(); ctx.arc(ix + cx * k, iy + cy * k, r * k, 0, Math.PI * 2); ctx.fill(); };
+  dot(27, 36, 14, "#7C5CFF"); dot(42, 22, 8, "#22D3EE"); dot(48, 40, 4, "#FF7A59");
+  ctx.fillStyle = "#FFFFFF";
+  ctx.textAlign = "left";
+  ctx.textBaseline = "middle";
+  ctx.fillText(label, ix + icon + gap, y + h / 2 + 1);
 }
 
 // ---------- timeline ----------
@@ -271,7 +293,7 @@ function sceneAt(starts: number[], a: Asset, t: number) {
   return 0;
 }
 
-export function createRenderer(a: Asset, p: Product, L: Loaded, style: TransitionStyle) {
+export function createRenderer(a: Asset, p: Product, L: Loaded, style: TransitionStyle, wm = false) {
   const { starts, total } = timeline(a);
   const A = document.createElement("canvas");
   const B = document.createElement("canvas");
@@ -291,8 +313,8 @@ export function createRenderer(a: Asset, p: Product, L: Loaded, style: Transitio
       if (i > 0 && lt < TRANS) {
         const k = style === "mixed" ? kinds[(i - 1) % kinds.length] : style;
         const prevLt = lt + a.scenes[i - 1].duration;
-        drawScene(ca, a, p, L, i - 1, Math.min(prevLt, a.scenes[i - 1].duration + 2), t);
-        drawScene(cb, a, p, L, i, lt, t);
+        drawScene(ca, a, p, L, i - 1, Math.min(prevLt, a.scenes[i - 1].duration + 2), t, wm);
+        drawScene(cb, a, p, L, i, lt, t, wm);
         const e = easeInOut(lt / TRANS);
         ctx.save();
         if (k === "push") {
@@ -322,7 +344,7 @@ export function createRenderer(a: Asset, p: Product, L: Loaded, style: Transitio
         ctx.globalAlpha = 1;
         return;
       }
-      drawScene(ctx, a, p, L, i, lt, t);
+      drawScene(ctx, a, p, L, i, lt, t, wm);
     },
   };
 }

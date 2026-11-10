@@ -107,5 +107,10 @@ export async function currentUser(): Promise<User | null> {
 }
 
 export function publicUser(u: User) {
-  return { id: u.id, username: u.username, name: u.name, mcpToken: u.mcpToken };
+  return { id: u.id, username: u.username, name: u.name, mcpToken: u.mcpToken, plan: u.plan ?? "free" };
+}
+
+export async function setPlan(user: User, plan: "free" | "pro") {
+  user.plan = plan;
+  await writeDoc(`users/${user.username}.json`, user);
 }

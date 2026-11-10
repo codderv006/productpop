@@ -1,6 +1,7 @@
 import { ImageResponse } from "next/og";
 import { getWorkspace } from "@/lib/workspace";
 import { getMedia } from "@/lib/store";
+import { getUserById } from "@/lib/auth";
 import { CarouselSlide, SceneFrame, SIZES, TextCard, VisualPost } from "@/lib/templates";
 import type { Aspect } from "@/lib/types";
 
@@ -57,24 +58,26 @@ export async function GET(req: Request, ctx: Ctx) {
   const download = u.searchParams.get("download") === "1";
   const base = u.origin;
   const logo = await resolveImage(product.logoUrl, base);
+  const owner = await getUserById(uid);
+  const watermark = (owner?.plan ?? "free") === "free";
 
   let el: React.ReactElement;
   let size: { width: number; height: number };
   if (scene !== null) {
     const i = Number(scene) || 0;
     const image = await resolveImage(asset.scenes[i]?.imageUrl, base);
-    el = <SceneFrame asset={asset} index={i} ctx={{ product, logo, image, aspect: "story" }} />;
+    el = <SceneFrame asset={asset} index={i} ctx={{ product, logo, image, aspect: "story", watermark }} />;
     size = SIZES.story;
   } else if (asset.format === "carousel") {
     const aspect: Aspect = asset.visual.aspect === "landscape" ? "square" : asset.visual.aspect;
-    el = <CarouselSlide asset={asset} index={slide} ctx={{ product, logo, aspect }} />;
+    el = <CarouselSlide asset={asset} index={slide} ctx={{ product, logo, aspect, watermark }} />;
     size = SIZES[aspect];
   } else if (asset.format === "visual_post") {
     const image = await resolveImage(asset.visual.imageUrl, base);
-    el = <VisualPost asset={asset} ctx={{ product, logo, image, aspect: asset.visual.aspect }} />;
+    el = <VisualPost asset={asset} ctx={{ product, logo, image, aspect: asset.visual.aspect, watermark }} />;
     size = SIZES[asset.visual.aspect];
   } else {
-    el = <TextCard asset={asset} ctx={{ product, logo, aspect: asset.visual.aspect }} />;
+    el = <TextCard asset={asset} ctx={{ product, logo, aspect: asset.visual.aspect, watermark }} />;
     size = SIZES[asset.visual.aspect];
   }
 

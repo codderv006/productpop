@@ -109,5 +109,6 @@ export interface User {
   passwordHash: string;
   salt: string;
   mcpToken: string;
+  plan?: "free" | "pro";
   createdAt: string;
 }

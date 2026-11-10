@@ -4,7 +4,7 @@ import { createContext, useCallback, useContext, useEffect, useRef, useState } f
 import { usePathname, useRouter } from "next/navigation";
 import type { Asset, AssetFormat, Platform, Workspace } from "@/lib/types";
 
-type U = { id: string; username: string; name: string; mcpToken: string };
+type U = { id: string; username: string; name: string; mcpToken: string; plan: "free" | "pro" };
 type Ctx = {
   ws: Workspace | null;
   user: U | null;
@@ -52,6 +52,7 @@ export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
     }
     seen.current = new Set(ids);
     for (const p of w.products) productStamp[p.id] = p.updatedAt;
+    planStamp = data.user.plan ?? "free";
     const top = w.activity[0];
     if (top && lastActivity.current && top.at !== lastActivity.current && top.actor === "claude") toast(`Claude: ${top.summary}`);
     lastActivity.current = top?.at ?? "";
@@ -97,9 +98,10 @@ export const FORMAT: Record<AssetFormat, string> = {
 
 // product "version" per product id, so images re-render when the brand/logo changes
 const productStamp: Record<string, string> = {};
+let planStamp = "free";
 export function renderUrl(uid: string, a: Asset, extra = "") {
   const p = productStamp[a.productId] ? `&p=${encodeURIComponent(productStamp[a.productId])}` : "";
-  return `/api/render/${uid}/${a.id}?v=${a.version}${p}${extra}`;
+  return `/api/render/${uid}/${a.id}?v=${a.version}${p}&pl=${planStamp}${extra}`;
 }
 
 export function ProductMark({ p, size = 17 }: { p: { name: string; logoUrl: string; brand: { primary: string; accent: string } }; size?: number }) {
