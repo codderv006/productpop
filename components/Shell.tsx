@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { ProductMark, useWs } from "./ws";
 import { Logo } from "./Logo";
@@ -23,6 +24,8 @@ export default function Shell({ children }: { children: React.ReactNode }) {
   const path = usePathname();
   const router = useRouter();
   const { ws, user, refresh, toast } = useWs();
+  const [open, setOpen] = useState(false);
+  useEffect(() => setOpen(false), [path]);
   const nav = (href: string, label: string, icon: string, exact = false) => {
     const on = exact ? path === href : path.startsWith(href);
     return (
@@ -33,7 +36,18 @@ export default function Shell({ children }: { children: React.ReactNode }) {
     );
   };
   return (
-    <div className="shell">
+    <div className={"shell" + (open ? " nav-open" : "")}>
+      <header className="topbar">
+        <Link href="/" className="logo" style={{ padding: 0 }}>
+          <Logo size={28} />
+        </Link>
+        <button className="btn ghost sm menu-btn" aria-label="Menu" onClick={() => setOpen(!open)}>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+            {open ? <path d="M6 6l12 12M18 6 6 18" /> : <path d="M4 7h16M4 12h16M4 17h16" />}
+          </svg>
+        </button>
+      </header>
+      <div className="scrim" onClick={() => setOpen(false)} />
       <aside className="side">
         <Link href="/" className="logo">
           <Logo size={30} />
