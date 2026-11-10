@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { ProductMark, Who, ago, useWs } from "@/components/ws";
+import { ProductMark, Who, ago, api, useWs } from "@/components/ws";
 
 export default function Dashboard() {
-  const { ws, user, fresh } = useWs();
+  const { ws, user, fresh, refresh, toast } = useWs();
   if (!ws || !user) return null;
   const assets = ws.assets;
   const today = new Date().toISOString().slice(0, 10);
@@ -24,7 +24,23 @@ export default function Dashboard() {
           <h1>Hi {user.name.split(" ")[0]} 👋</h1>
           <p className="muted">Everything Claude writes for your products lands here — ready to edit, render and ship.</p>
         </div>
-        <span className="live">Live — syncing with Claude</span>
+        <div className="row" style={{ gap: 14 }}>
+          <span className="live">Live — syncing with Claude</span>
+          {user.username === "demo" ? (
+            <button
+              className="btn sm"
+              title="Clear all campaigns and start again from the sample FlowDesk product"
+              onClick={async () => {
+                if (!confirm("Reset the demo workspace? This removes every campaign and product and starts fresh with FlowDesk.")) return;
+                await api("/api/demo/reset", "POST");
+                await refresh();
+                toast("Demo reset — fresh FlowDesk workspace");
+              }}
+            >
+              ↺ Reset demo
+            </button>
+          ) : null}
+        </div>
       </div>
 
       <div className="dash-body">

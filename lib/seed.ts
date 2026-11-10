@@ -1,7 +1,13 @@
 import { mutate, newProduct } from "./workspace";
 
-export async function seedDemo(userId: string) {
+export async function seedDemo(userId: string, reset = false) {
   await mutate(userId, (ws) => {
+    if (reset) {
+      ws.products = [];
+      ws.campaigns = [];
+      ws.assets = [];
+      ws.activity = [];
+    }
     if (ws.products.length) return;
     const p = newProduct(
       {
