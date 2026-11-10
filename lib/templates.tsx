@@ -1,5 +1,6 @@
 /* eslint-disable @next/next/no-img-element, jsx-a11y/alt-text */
 import type { Asset, Aspect, Product } from "./types";
+import { firstSentence } from "./text";
 
 // Deterministic design templates rendered to PNG by Satori (next/og).
 // Every element with more than one child must use display:flex.
@@ -118,7 +119,7 @@ function Check({ color, size = 26 }: { color: string; size?: number }) {
   );
 }
 
-const shortCta = (a: Asset) => (a.cta || "").split(/[.!\n]/)[0].trim();
+const shortCta = (a: Asset) => firstSentence(a.cta);
 
 // ---------------- single visual posts ----------------
 

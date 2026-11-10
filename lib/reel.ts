@@ -5,6 +5,7 @@
 // with WebAudio, and records both with MediaRecorder. No AI, no external services.
 
 import type { Asset, Product } from "./types";
+import { firstSentence } from "./text";
 
 export const RW = 720;
 export const RH = 1280;
@@ -217,7 +218,7 @@ function drawScene(ctx: CanvasRenderingContext2D, a: Asset, p: Product, L: Loade
   }
 
   // CTA pop on last scene
-  const cta = (a.cta || "").split(/[.!\n]/)[0].trim();
+  const cta = firstSentence(a.cta);
   if (isLast && cta) {
     const t = (lt - lineDone - 0.2) / 0.5;
     if (t > 0) {
